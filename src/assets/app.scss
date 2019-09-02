@@ -1,7 +1,9 @@
 @import '~bootstrap/scss/bootstrap';
 @import './admin.scss';
 
-
+body{
+    font-family: 'Nunito', sans-serif !important;
+}
 
 .usuario{
     display: inline-block;
