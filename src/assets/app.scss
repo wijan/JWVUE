@@ -1,0 +1,20 @@
+@import '~bootstrap/scss/bootstrap';
+@import './admin.scss';
+
+
+
+.usuario{
+    display: inline-block;
+    padding: 1.5em;
+    text-align: center;
+}
+
+.usuario img{
+    display: block;
+}
+
+.img-responsive{
+    width: 100%;
+    height: auto;
+}
+
