@@ -3,16 +3,17 @@ import Router from 'vue-router'
 import Home from './views/landing/Home.vue'
 import Admin from './views/templates/backend/Admin.vue'
 import Dashboard from './views/templates/backend/Dashboard.vue'
-import Productos from './views/productos/Productos.vue'
-import Producto from './views/productos/Producto.vue'
-import Usuarios from './views/usuarios/Usuarios.vue'
-import Usuario from './views/usuarios/Usuario.vue'
+import Usuarios from './views/usuarios/Index.vue'
+import Usuario from './views/usuarios/Detalle.vue'
+import Hermanos from './views/hermanos/Index.vue'
 import Acerca from './views/landing/Acerca.vue'
 import Portada from './views/templates/frontend/Portada.vue'
+import {store} from './store'
+
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -37,22 +38,14 @@ export default new Router({
     {
       path: '/admin',
       component: Admin,
+      meta: {
+        requiereAuth: true
+      },
       children:[
         {
           path: "",
           name: "Dashboard",
           component: Dashboard
-        },
-        {
-          path:"productos",
-          name:"productos",
-          component:Productos,
-        },
-        {
-          path:"productos/:nombre",
-          name:"producto",
-          component:Producto,
-          props: true
         },
         {
           path: "usuarios",
@@ -64,8 +57,42 @@ export default new Router({
           name: "usuario",
           component: Usuario,
           props: true
+        },
+        {
+          path: "hermanos",
+          name: "Hermanos",
+          component: Hermanos
         }
       ]
     }
   ]
+});
+
+router.beforeEach((hacia, desde, siguiente) =>{
+  if(hacia.matched.some(ruta => ruta.meta.requiereAuth)){
+    let logeado = store.state.usuario.logeado;
+
+    if(!logeado){
+      siguiente('/')
+    }
+    else{
+      siguiente();
+    }
+  }
+  siguiente();
+  // const requiereAuth = hacia.matched.some(x => x.meta.requiereAuth);
+  // debugger;
+  // const usuarioActual = fb.auth().currentUser;
+
+  // if(requiereAuth && !usuarioActual){
+  //   siguiente('/')
+  // }
+  // else if(requiereAuth && usuarioActual){
+  //   siguiente()
+  // }
+  // else{
+  //   siguiente()
+  // }
 })
+
+export {router}

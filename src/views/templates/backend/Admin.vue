@@ -58,9 +58,9 @@
                             </router-link>
                         </li>
                         <li class="siderbar-dropdown">
-                            <router-link to="/admin/productos">
-                                <i class="fa fa-store"></i>
-                                <span class="menu-text">Productos</span>
+                            <router-link to="/admin/hermanos">
+                                <i class="fa fa-user-tie"></i>
+                                <span class="menu-text">Hermanos</span>
                             </router-link>
                         </li>
                         <li class="siderbar-dropdown">
@@ -69,6 +69,13 @@
                                 <span class="menu-text">Usuarios</span>
                             </router-link>
                         </li>
+                        <li class="siderbar-dropdown">
+                            <a href="" @click="cerrarSesion">
+                                <i class="fa fa-power-off"></i>
+                                <span class="menu-text">Cerrar Sesión</span>
+                            </a>
+                        </li>
+
                         <!-- <li class="header-menu">
                             <span>Extra</span>
                         </li>
@@ -108,11 +115,29 @@
 </template>
 
 <script>
+import {store} from '@/store'
+import {router} from '@/router';
+
 export default {
     name: "admin",
     methods:{
         toggleMenu(){
+            // eslint-disable-next-line
             $(".page-wrapper").toggleClass("toggled");
+        },
+        cerrarSesion(){
+            store.dispatch('logout')
+                .then(() => {
+                    router.push({name: 'home'});
+                })
+            // fb.auth().signOut()
+            //     .then((user) => {
+            //         console.log(user);
+            //         router.push({name: 'home'});
+            //     })
+            //     .catch(function(error){
+            //         console.log(error);
+            //     });
         }
     }
 }

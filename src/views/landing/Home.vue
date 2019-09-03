@@ -1,72 +1,48 @@
 <template>
-  <div class="home">
-    
+  <div id="home" class="col-md-12">
     <div class="col-md-4 offset-md-7">
-              <div class="contenido">
-                <h1 class="hero-title">
-                  JW Management
-                </h1>
-                <p>
-                  Con JW Management podrás gestionar todo lo que tenga que ver con la congregación:
-                  <ul>
-                    <li>
-                      <icono :icon="'users'"/> Hermanos 
-                    </li>
-                    <li>
-                      <icono :icon="'file-alt'"/> Asignaciones 
-                    </li>
-                    <li>
-                      <icono :icon="'map-marked-alt'"/> Territorios 
-                    </li>
-                    <li>
-                      <icono :icon="'tasks'"/> Responsabilidades 
-                    </li>
-                  </ul>
-
-                </p>
-                <div class="hero-btn mt-5">
-                  <button class="btn btn-info custom-btn mr-4" @click="empezar">
-                      <icono :icon="'sign-in-alt'"/>
-                      <span class="menu-text"> Empezar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+      <h1 class="titulo-home">JW Management</h1>
+      <p>Con JW Management podrás gestionar todo lo que tenga que ver con la congregación:</p>
+      <ul>
+        <li>Hermanos</li>
+        <li>Asignaciones</li>
+        <li>Territorios</li>
+        <li>Responsabilidades</li>
+      </ul>
+      <div class="hero-btn mt-5">
+        <button class="btn btn-info custom-btn mr-4" data-toggle="modal" data-target="#Login" >
+          <icono :icon="'sign-in-alt'" />
+          <span class="menu-text">Iniciar sesión</span>
+        </button>
+        <button class="btn btn-info custom-btn mr-4" data-toggle="modal" data-target="#Registro" >
+          <icono :icon="'sign-in-alt'" />
+          <span class="menu-text">Empezar</span>
+        </button>
+      </div>
     </div>
+    <Login></Login>
+    <Registro></Registro>
   </div>
-  
-    
-
 </template>
 
 <script>
 // @ is an alias to /src
-
+import Login from '@/views/landing/_Login.vue'
+import Registro from '@/views/landing/_Registro.vue'
 export default {
-  name: 'home',
+  name: "home",
   components: {
+    Login,
+    Registro
   },
-  methods:{
-    empezar: function(){
-      window.location.href="/admin"
-    }
-  }
-}
+};
 </script>
 <style scoped lang="scss">
-  .portada{
-    padding-top: 7rem;
-    width: 100%;
-    height: 800px;
-    text-align: left;
-  }
-
-  #portada{
-    background: url("~@/assets/imagenes/management1.png") no-repeat ;
+  #home{
+    background: url("~@/assets/imagenes/management1.png") no-repeat;
     background-size: 100% auto;
+    padding-top:12rem;
+    height: 800px;
   }
 
-  a{
-    color:white;
-  }
 </style>

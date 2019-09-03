@@ -27,7 +27,6 @@ export default {
     methods:{
         fetchData: function(){
             let vue = this;
-            var usuarios = [];
             for(let i = 1; i < 10; i++){
                 let url = 'https://reqres.in/api/users?page=' + i;
                 fetch(url)
