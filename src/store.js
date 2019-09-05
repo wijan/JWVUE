@@ -43,7 +43,6 @@ const store = new Vuex.Store({
         fb.auth().signInWithEmailAndPassword(datosLogin.email, datosLogin.pass)
           .then(()=>{
             fb.auth().onAuthStateChanged(usuarioAutenticado =>{
-              debugger;
               commit('login', usuarioAutenticado);
               solucion()
             });
