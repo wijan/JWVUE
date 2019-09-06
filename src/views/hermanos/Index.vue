@@ -1,50 +1,20 @@
 <template>
   <div class="vistaBackend">
     <h3>Hermanos</h3>
-    <table class="table table-striped table-bordered" v-show="hermanos.length > 0">
+    <table class="table table-striped table-bordered" v-show="hermanosOrdenados.length > 0">
       <thead>
         <tr>
-          <th @click="ordenar('nombreCompleto')">
-            Nombre Completo
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'nombreCompleto' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'nombreCompleto' && orden.sentido === 'desc'"/>
-          </th>
-          <th @click="ordenar('nombre')">
-            Nombre
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'nombre' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'nombre' && orden.sentido === 'desc'"/>
-          </th>
-          <th @click="ordenar('nombre2')">
-            2º nombre
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'nombre2' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'nombre2' && orden.sentido === 'desc'"/>
-          </th>
-          <th @click="ordenar('apellido1')">
-            Apellido 1
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'apellido1' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'apellido1' && orden.sentido === 'desc'"/>
-          </th>
-          <th @click="ordenar('apellido2')">
-            Apellido 2
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'apellido2' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'apellido2' && orden.sentido === 'desc'"/>
-          </th>
-          <th @click="ordenar('fechaNacimiento')">
-            Fecha Nacimiento
-            <icono class="ordenacion" :icon="'sort-up'" v-show="orden.campo === 'fechaNacimiento' && orden.sentido === 'asc'"/>
-            <icono class="ordenacion" :icon="'sort-down'"  v-show="orden.campo === 'fechaNacimiento' && orden.sentido === 'desc'"/>
+          <th v-for="campo in campos" :key="campo.orden" @click="campo.ordenable ? ordenar(campo.clave) : ''">
+            {{campo.titulo}}
+            <icono class="ordenacion" :icon="'sort-up'" v-show="campo.ordenable && orden.campo === campo.clave && orden.sentido === 'asc'"/>
+            <icono class="ordenacion" :icon="'sort-down'" v-show="campo.ordenable && orden.campo === campo.clave && orden.sentido === 'desc'"/>
           </th>
           <th>Eliminar</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="hermano in hermanosOrdenados" :key="hermano.id">
-          <td>{{hermano.nombreCompleto}}</td>
-          <td>{{hermano.nombre}}</td>
-          <td>{{hermano.nombre2}}</td>
-          <td>{{hermano.apellido1}}</td>
-          <td>{{hermano.apellido2}}</td>
-          <td>{{hermano.fechaNacimiento}}</td>
+          <td v-for="campo in campos" :key="campo.orden">{{hermano[campo.clave]}}</td>
           <td class="text-center">
             <button class="btn btn-danger" @click="eliminar(hermano.id)">
               <icono title="Eliminar" :icon="'trash'"/>
@@ -59,36 +29,28 @@
       </li>
     </ul> -->
     <div class="crear form-row">
-      <div class="col-lg-2 form-group">
-        <label for="nombre">Nombre:</label>
-        <input type="text" class="form-control" name="nombre" id="nombre" v-model="hermano.nombre">
-      </div>
-      <div class="col-lg-2 form-group">
-        <label for="nombre2">Segundo nombre:</label>
-        <input type="text" class="form-control" name="nombre2" id="nombre2" v-model="hermano.nombre2">
-      </div>
-      <div class="col-lg-2 form-group">
-        <label for="apellido1">Primer apellido:</label>
-        <input type="text" class="form-control" name="apellido1" id="apellido1" v-model="hermano.apellido1">
-      </div>
-      <div class="col-lg-2 form-group">
-        <label for="apellido2">Segundo apellido:</label>
-        <input type="text" class="form-control" name="apellido2" id="apellido2" v-model="hermano.apellido2">
-      </div>
-      <div class="col-lg-2 form-group">
-        <label for="apellido2">Fecha de Nacimiento:</label>
-        <Calendario v-model="hermano.fechaNacimiento" input-class="form-control"></Calendario>
+      <div class="col-lg-2 form-group"  v-for="campo in camposCrear" :key="campo.orden">
+        <label :for="campo.clave">{{campo.titulo}}</label>
+        <input class="form-control" type="text" :name="campo.clave" :id="campo.clave" v-model="hermano[campo.clave]" v-if="campo.tipo === 'string'">
+        <Calendario v-model="hermano[campo.clave]" input-class="form-control" v-if="campo.tipo === 'fecha'"></Calendario>
       </div>
     </div>
     <button class="btn btn-success" @click="agregar">
       <icono :icon="'save'"/> Guardar hermano
+    </button>
+    <button class="btn btn-success" @click="mensaje">
+      <icono :icon="'envelope'"/> Test mensaje
     </button>
   </div>
 </template>
 
 <script>
 import {db} from '@/firebase'
-var coleccion = db.collection('hermanos');
+import io from 'socket.io-client'
+
+var datos = 'hermanos';
+var coleccion = db.collection(datos);
+var camposDB = db.collection('campos');
 
 // let opcionesFecha = {
 //   year: 'numeric',
@@ -112,10 +74,31 @@ export default {
         campo: 'nombreCompleto',
         sentido: 'asc'
       },
-      campos:[]
+      campos:[],
+      socket: io('localhost:3001')
+    }
+  },
+  sockets: {
+    connect() {
+      // Fired when the socket connects.
+      this.isConnected = true;
+    },
+
+    disconnect() {
+      this.isConnected = false;
     }
   },
   methods:{
+    cargarCampos: function(){
+      camposDB.where('coleccion', '==', datos).get().then(peticion => {
+        peticion.forEach(doc => {
+          let datosCampos = doc.data();
+          this.campos = datosCampos.datos.sort((a,b) => {
+            return a.orden > b.orden ? 1 : -1;
+          });
+        })
+      });
+    },
     cargarDatos: function(){
       this.hermanos = [];
       this.campos = [];
@@ -127,11 +110,11 @@ export default {
         this.campos = this.campos.unique();
         peticion.forEach((doc)=>{
           var datoCargado = doc.data();
-          // datoCargado.nombreCompleto = datoCargado.nombreCompleto ? datoCargado.nombreCompleto : '';
-          // datoCargado.nombre = datoCargado.nombre ? datoCargado.nombre : '';
-          // datoCargado.nombre2 = datoCargado.nombre2 ? datoCargado.nombre2 : '';
-          // datoCargado.apellido1 = datoCargado.apellido1 ? datoCargado.apellido1 : '';
-          // datoCargado.apellido2 = datoCargado.apellido2 ? datoCargado.apellido2 : '';
+          datoCargado.nombreCompleto = datoCargado.nombreCompleto ? datoCargado.nombreCompleto : '';
+          datoCargado.nombre = datoCargado.nombre ? datoCargado.nombre : '';
+          datoCargado.nombre2 = datoCargado.nombre2 ? datoCargado.nombre2 : '';
+          datoCargado.apellido1 = datoCargado.apellido1 ? datoCargado.apellido1 : '';
+          datoCargado.apellido2 = datoCargado.apellido2 ? datoCargado.apellido2 : '';
           datoCargado.fechaNacimiento = datoCargado.fechaNacimiento ? formatearFecha(new Date(datoCargado.fechaNacimiento.seconds*1000)) : "";
           
           datoCargado["id"] = doc.id;
@@ -180,6 +163,14 @@ export default {
         this.orden.campo = campoOrden;
         this.orden.sentido = 'asc';
       }
+    },
+    mensaje(){
+      console.log('enviando mensaje');
+      var comunicacion = {
+        id: this.socket.id,
+        mensaje: 'Mensaje enviado'
+      };
+      this.socket.emit('ENVIAR_MENSAJE', comunicacion)
     }
   },
   computed: {
@@ -194,10 +185,22 @@ export default {
         else resultado = (campoA > campoB) ? 1 : -1;
         return this.orden.sentido === 'asc' ? resultado : (resultado * (-1));
       });
+    },
+    camposCrear: function(){
+      return this.campos.filter(c => c.crear);
     }
   },
   mounted(){
+    this.socket.on('MENSAJE_ENTRANTE', (data) => {
+      if(data.id !== this.socket.id){
+        console.log(data.mensaje);
+      }
+      else{
+        console.log('Enviaste el mensaje al resto de usuarios.');
+      }
+    });
     coleccion.onSnapshot(()=>{
+      this.cargarCampos();
       this.cargarDatos();
     })
   }

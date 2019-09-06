@@ -7,7 +7,6 @@ import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css'
 
 
-
 window.$ = window.jQuery = jQuery;
 
 import 'popper.js';
@@ -24,5 +23,5 @@ Vue.config.productionTip = false
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
 }).$mount('#app')
