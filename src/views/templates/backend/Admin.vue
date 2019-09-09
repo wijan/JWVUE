@@ -234,7 +234,6 @@ export default {
                     idChat: 1,
                     cerrado: false,
                     nuevoMensaje: true,
-                    mensajeChat: '',
                 },
                 {
                     activo: false,
@@ -244,7 +243,6 @@ export default {
                     idChat: 2,
                     cerrado: false,
                     nuevoMensaje: false,
-                    mensajeChat: '',
                 },
                 {
                     activo: false,
@@ -254,7 +252,6 @@ export default {
                     idChat: 3,
                     cerrado: false,
                     nuevoMensaje: false,
-                    mensajeChat: '',
                 }
             ],
             // chat: false,
