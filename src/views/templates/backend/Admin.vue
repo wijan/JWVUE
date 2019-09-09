@@ -396,7 +396,6 @@ export default {
         padding: 0.5rem;
         display: flex;
         flex-flow: wrap;
-        
         margin-bottom: 0.5rem;
     }
 
@@ -418,12 +417,12 @@ export default {
         text-align: left;
         background-color: #4fa8f15c;
         border: 0.1rem solid gainsboro;
-        border-radius: 0.5rem;
+        border-radius: 0rem 0.7rem 0.7rem 0.7rem;
     }
 
     .chat .chat-content .received{
         border: 0.1rem solid gainsboro;
-        border-radius: 0.5rem;
+        border-radius: 0.7rem 0 0.7rem 0.7rem;
         float:right;
     }
 
