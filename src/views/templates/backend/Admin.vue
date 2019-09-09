@@ -153,7 +153,7 @@
                     </div>
                 </div>
                 <div class="new-message" v-show="chat.activo">
-                    <textarea rows="1" id="newMessageInput" class="chat-message-zone" placeholder="Escriba..." v-model="mensajeChat" ></textarea>
+                    <textarea rows="1" id="newMessageInput" class="chat-message-zone" placeholder="Escriba..." v-model="chat.mensajeChat" ></textarea>
                     <button class="chat-send">
                         <icono :icon="'paper-plane'"/> Enviar
                     </button>
@@ -233,7 +233,8 @@ export default {
                     nombreUsuario: 'Jaime Calzas',
                     idChat: 1,
                     cerrado: false,
-                    nuevoMensaje: true
+                    nuevoMensaje: true,
+                    mensajeChat: '',
                 },
                 {
                     activo: false,
@@ -242,7 +243,8 @@ export default {
                     nombreUsuario: 'Silvio Jérez',
                     idChat: 2,
                     cerrado: false,
-                    nuevoMensaje: false
+                    nuevoMensaje: false,
+                    mensajeChat: '',
                 },
                 {
                     activo: false,
@@ -251,11 +253,12 @@ export default {
                     nombreUsuario: 'Roberto Pacheco',
                     idChat: 3,
                     cerrado: false,
-                    nuevoMensaje: false
+                    nuevoMensaje: false,
+                    mensajeChat: '',
                 }
             ],
             // chat: false,
-            mensajeChat: '',
+            
             // usuarioActivo: false
         }
     },
