@@ -38,15 +38,12 @@
     <button class="btn btn-success" @click="agregar">
       <icono :icon="'save'"/> Guardar hermano
     </button>
-    <button class="btn btn-success" @click="mensaje">
-      <icono :icon="'envelope'"/> Test mensaje
-    </button>
   </div>
 </template>
 
 <script>
 import {db} from '@/firebase'
-import io from 'socket.io-client'
+
 
 var datos = 'hermanos';
 var coleccion = db.collection(datos);
@@ -74,18 +71,7 @@ export default {
         campo: 'nombreCompleto',
         sentido: 'asc'
       },
-      campos:[],
-      socket: io('localhost:3001')
-    }
-  },
-  sockets: {
-    connect() {
-      // Fired when the socket connects.
-      this.isConnected = true;
-    },
-
-    disconnect() {
-      this.isConnected = false;
+      campos:[]
     }
   },
   methods:{
@@ -164,18 +150,10 @@ export default {
         this.orden.sentido = 'asc';
       }
     },
-    mensaje(){
-      console.log('enviando mensaje');
-      var comunicacion = {
-        id: this.socket.id,
-        mensaje: 'Mensaje enviado'
-      };
-      this.socket.emit('ENVIAR_MENSAJE', comunicacion)
-    }
   },
   computed: {
     hermanosOrdenados:function(){
-      return this.hermanos.sort((a,b)=>{
+      return this.hermanos.slice().sort((a,b)=>{
         let campoA = a[this.orden.campo], campoB = b[this.orden.campo];
         let campoAOK = campoA !== '', campoBOK = campoB !== '';
         let resultado;
@@ -191,14 +169,6 @@ export default {
     }
   },
   mounted(){
-    this.socket.on('MENSAJE_ENTRANTE', (data) => {
-      if(data.id !== this.socket.id){
-        console.log(data.mensaje);
-      }
-      else{
-        console.log('Enviaste el mensaje al resto de usuarios.');
-      }
-    });
     coleccion.onSnapshot(()=>{
       this.cargarCampos();
       this.cargarDatos();
