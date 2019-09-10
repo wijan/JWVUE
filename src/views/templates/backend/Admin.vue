@@ -110,7 +110,15 @@
             </div>
         </main>
         <div id="chats">
-            <!---->
+            <div class="chat new" @click.stop="mostrarNuevoChat" :class="{'activo': nuevoChat.activo}">
+                <div class="chat-title">
+                    <icono :icon="'plus'" v-show="!nuevoChat.activo"/> Nuevo chat
+                    <div class="chat-minmax" @click.stop="ocultarNuevoChat" v-show="nuevoChat.activo"><icono :icon="'minus'"/></div>
+                </div>
+                <div class="chat-content" v-show="nuevoChat.activo">
+
+                </div>
+            </div>
             <div class="chat" v-show="!chat.cerrado" v-for="chat in chats.slice().reverse()" :key="chat.idChat" :class="{'activo': chat.activo }" @click="mostrarChat(chat.idChat)">
                 <div class="chat-title" :class="{'nuevoMensaje': chat.nuevoMensaje}">
                     {{chat.nombreUsuario}}
@@ -120,35 +128,12 @@
                     <div class="chat-minmax" @click.stop="mostrarChat(chat.idChat)" v-show="!chat.activo"><icono :icon="'plus'"/></div>
                 </div>
                 <div class="chat-content" v-show="chat.activo">
-                    <div class="sended message">
+                    <div class="message" v-for="mensaje in chat.mensajes" :key="mensaje.id" :class="{'sended': mensaje.idUsuario === idUsuario, 'received': mensaje.idUsuario !== idUsuario}">
                         <p>
-                            Buenas Jaime, como estas?
+                            {{mensaje.contenido}}
                         </p>
                         <div class="momento">
-                            09/09/19 15:41
-                        </div>
-                    </div>
-                    <div class="received message">
-                        <p>
-                            Bien, trabajando!
-                        </p>
-                        <div class="momento">
-                            09/09/19 15:44
-                        </div>
-                    </div>
-                    <div class="received message">
-                        <p>
-                            Algo liado, pero dime
-                        </p>
-                        <br>
-                        <div class="momento">
-                            09/09/19 15:44
-                        </div>
-                    </div>
-                    <div class="sended message">
-                        <p>Vaya, jo, era por si querías ir a hacer padel despues.</p>
-                        <div class="momento">
-                            09/09/19 15:46
+                            {{mensaje.momento}}
                         </div>
                     </div>
                 </div>
@@ -158,58 +143,8 @@
                         <icono :icon="'paper-plane'"/> Enviar
                     </button>
                 </div>
-                
             </div>
-            <!-- <div class="chat" :class="{'activo': chat }" @click="mostrarChat">
-                <div class="chat-title">
-                    Jaime Calzas
-                    <div class="chat-icon" :class="{'usuario-activo': usuarioActivo, 'usuario-inactivo': !usuarioActivo }"></div>
-                    <div class="chat-minmax" @click.stop="ocultarChat" v-show="chat"><icono :icon="'minus'"/></div>
-                    <div class="chat-minmax" @click.stop="mostrarChat" v-show="!chat"><icono :icon="'plus'"/></div>
-                </div>
-                <div class="chat-content" v-show="chat">
-                    <div class="sended message">
-                        <p>
-                            Buenas Jaime, como estas?
-                        </p>
-                        <div class="momento">
-                            09/09/19 15:41
-                        </div>
-                    </div>
-                    <div class="received message">
-                        <p>
-                            Bien, trabajando!
-                        </p>
-                        <div class="momento">
-                            09/09/19 15:44
-                        </div>
-                    </div>
-                    <div class="received message">
-                        <p>
-                            Algo liado, pero dime
-                        </p>
-                        <br>
-                        <div class="momento">
-                            09/09/19 15:44
-                        </div>
-                    </div>
-                    <div class="sended message">
-                        <p>Vaya, jo, era por si querías ir a hacer padel despues.</p>
-                        <div class="momento">
-                            09/09/19 15:46
-                        </div>
-                    </div>
-                </div>
-                <div class="new-message" v-show="chat">
-                    <textarea rows="1" id="newMessageInput" class="chat-message-zone" :class="activo" placeholder="Escriba..." v-model="mensajeChat" ></textarea>
-                    <button class="chat-send">
-                        <icono :icon="'paper-plane'"/> Enviar
-                    </button>
-                </div>
-                
-            </div> -->
         </div>
-        <!-- page-content" -->
     </div>
   
 </template>
@@ -225,6 +160,10 @@ export default {
     data: function(){
         return{
             socket: io('localhost:3001'),
+            idUsuario: this.$store.state.usuario.id,
+            nuevoChat:{
+                activo: false
+            },
             chats:[
                 {
                     activo: false,
@@ -234,6 +173,32 @@ export default {
                     idChat: 1,
                     cerrado: false,
                     nuevoMensaje: true,
+                    mensajes:[
+                        {
+                            id: 1,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '09/09/19 15:41',
+                            contenido: 'Buenas Jaime, ¿cómo estás?'
+                        },
+                        {
+                            id: 2,
+                            idUsuario: "tururu",
+                            momento: '09/09/19 15:44',
+                            contenido: 'Bien, trabajando!'
+                        },
+                        {
+                            id: 3,
+                            idUsuario: "tururu",
+                            momento: '09/09/19 15:44',
+                            contenido: 'Algo liado, pero dime'
+                        },
+                        {
+                            id: 4,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '09/09/19 15:46',
+                            contenido: 'Vaya, jo, era por si querías ir a hacer padel después.'
+                        },
+                    ]
                 },
                 {
                     activo: false,
@@ -243,6 +208,62 @@ export default {
                     idChat: 2,
                     cerrado: false,
                     nuevoMensaje: false,
+                    mensajes:[
+                        {
+                            id: 5,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 13:20',
+                            contenido: 'Silvio, ya tengo los precios de los hoteles'
+                        },
+                        {
+                            id: 6,
+                            idUsuario: "tarara",
+                            momento: '10/09/19 13:22',
+                            contenido: 'Perfecto! Enviamelos cuándo puedas por favor'
+                        },
+                        {
+                            id: 7,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 13:23',
+                            contenido: 'Ok, te los envío ahora.'
+                        },
+                        {
+                            id: 8,
+                            idUsuario: "tarara",
+                            momento: '10/09/19 13:23',
+                            contenido: 'Muy bien, gracias.'
+                        },
+                        {
+                            id: 9,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 13:24',
+                            contenido: '¿Los comentemos el viernes?'
+                        },
+                        {
+                            id: 14,
+                            idUsuario: "tarara",
+                            momento: '10/09/19 13:25',
+                            contenido: 'No, mejor el sábado.'
+                        },
+                        {
+                            id: 15,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 13:26',
+                            contenido: 'Vaya, es que el sábado he quedado con Roberto para explicarle cómo funciona la aplicación.'
+                        },
+                        {
+                            id: 16,
+                            idUsuario: "tarara",
+                            momento: '10/09/19 13:26',
+                            contenido: 'Pues el domingo, después de la reunión.'
+                        },
+                        {
+                            id: 17,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 13:27',
+                            contenido: 'Vale, el domingo sí puedo.'
+                        },
+                    ]
                 },
                 {
                     activo: false,
@@ -252,6 +273,32 @@ export default {
                     idChat: 3,
                     cerrado: false,
                     nuevoMensaje: false,
+                    mensajes:[
+                        {
+                            id: 10,
+                            idUsuario: "trucutru",
+                            momento: '10/09/19 10:20',
+                            contenido: 'Bones señor, está muy chula la aplicación.'
+                        },
+                        {
+                            id: 11,
+                            idUsuario: "trucutru",
+                            momento: '10/09/19 10:20',
+                            contenido: 'A ver si un día podemos quedar para que me expliques en más detalle cómo funciona.'
+                        },
+                        {
+                            id: 12,
+                            idUsuario: "XySg9ypAIlZyaiX8FCSjRaRStMo2",
+                            momento: '10/09/19 10:23',
+                            contenido: 'Sí claro, te va bien el sábado?.'
+                        },
+                        {
+                            id: 13,
+                            idUsuario: "trucutru",
+                            momento: '10/09/19 10:30',
+                            contenido: 'Sí, nos vemos el sábado entonces.'
+                        }
+                    ]
                 }
             ],
             // chat: false,
@@ -289,6 +336,12 @@ export default {
         },
         cerrarChat(idChat){
             this.chats.find(c => c.idChat === idChat).cerrado = true;
+        },
+        mostrarNuevoChat(){
+            this.nuevoChat.activo = true;
+        },
+        ocultarNuevoChat(){
+            this.nuevoChat.activo = false;
         },
         cerrarSesion(){
             store.dispatch('logout')
@@ -338,6 +391,16 @@ export default {
         bottom: 0;
         border-right: 1.5px solid black;
     }
+
+    .chat.new{
+        width: 10rem;
+    }
+
+    .chat.new.activo{
+        width: 25rem;
+    }
+
+    
 
     .chat.activo{
         width:25rem;

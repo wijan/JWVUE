@@ -34,7 +34,12 @@ const store = new Vuex.Store({
       state.usuario.logeado = true;
     },
     logout(state){
-      state.usuario = usuarioNulo;
+      state.usuario = {
+        logeado: false,
+        nombre: null,
+        id: null,
+        email: null
+      };
     }
   },
   actions: {
